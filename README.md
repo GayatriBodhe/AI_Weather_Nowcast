@@ -18,4 +18,9 @@ iii. Support Decision-Making: Assist the India Meteorological Department (IMD) a
 
 iv. Improve Safety: Reduce risks for people in vulnerable areas by predicting dangerous weather before it strikes.
 
+Sample Radar Image:
+
+<img width="801" height="736" alt="image" src="https://github.com/user-attachments/assets/23bfec23-3103-4dd4-9cd8-cb8c72e3b743" />
+
+
 By tailoring the system to India’s unique weather patterns and using local radar data, this project aims to make weather predictions more reliable and actionable, especially during the monsoon season when extreme weather is frequent.
