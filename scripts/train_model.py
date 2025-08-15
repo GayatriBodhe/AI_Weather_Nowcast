@@ -4,8 +4,9 @@ from tensorflow.keras.layers import ConvLSTM2D, BatchNormalization, Conv2D #type
 import numpy as np
 import glob
 import os
+import matplotlib.pyplot as plt
 
-# Load sequences
+# Load sequences (assuming output_length=1 from create_sequences.py)
 input_files = sorted(glob.glob('data/processed/sequences/*_input.npy'))
 output_files = sorted(glob.glob('data/processed/sequences/*_output.npy'))
 
@@ -13,29 +14,34 @@ output_files = sorted(glob.glob('data/processed/sequences/*_output.npy'))
 X = np.array([np.load(f) for f in input_files])
 y = np.array([np.load(f) for f in output_files])
 
-print(f"X shape: {X.shape}, y shape: {y.shape}")  # Debug: (305, 6, 128, 128, 1), (305, 12, 128, 128, 1)
+print(f"X shape: {X.shape}, y shape: {y.shape}")  # Should be e.g., (samples, 6, 128, 128, 1), (samples, 1, 128, 128, 1)
 
-# Model definition
+# Model definition for single-frame prediction
 model = Sequential([
     ConvLSTM2D(filters=64, kernel_size=(3, 3), input_shape=(6, 128, 128, 1), padding='same', return_sequences=True),
     BatchNormalization(),
     ConvLSTM2D(filters=64, kernel_size=(3, 3), padding='same', return_sequences=True),
     BatchNormalization(),
-    ConvLSTM2D(filters=64, kernel_size=(3, 3), padding='same', return_sequences=False),  # Output single frame
+    ConvLSTM2D(filters=64, kernel_size=(3, 3), padding='same', return_sequences=False),  # Collapse to single frame
     BatchNormalization(),
-    Conv2D(filters=1, kernel_size=(3, 3), activation='sigmoid', padding='same')  # Single frame output
+    Conv2D(filters=1, kernel_size=(3, 3), activation='sigmoid', padding='same')  # Output: (None, 128, 128, 1)
 ])
 
+# Compile model
 model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+
+# Model summary
 model.summary()
 
+# Train model
 history = model.fit(X, y, epochs=10, batch_size=4, validation_split=0.2, verbose=1)
+
+# Save model
+os.makedirs('models', exist_ok=True)
 model.save('models/nowcast_model.h5')
 print("Model saved to models/nowcast_model.h5")
 
-# Optional: Plot training history
-import matplotlib.pyplot as plt
-
+# Plot training history
 plt.figure(figsize=(12, 4))
 plt.subplot(1, 2, 1)
 plt.plot(history.history['loss'], label='Training Loss')
