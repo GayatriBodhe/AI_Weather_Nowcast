@@ -1,12 +1,14 @@
+#type: ignore 
 import tensorflow as tf
-from tensorflow.keras.models import Sequential #type: ignore
-from tensorflow.keras.layers import ConvLSTM2D, BatchNormalization, Conv2D #type: ignore
+from tensorflow.keras.models import Sequential 
+from tensorflow.keras.layers import ConvLSTM2D, BatchNormalization, Conv2D
+from tensorflow.keras.callbacks import ModelCheckpoint
 import numpy as np
 import glob
 import os
 import matplotlib.pyplot as plt
 
-# Load sequences (assuming output_length=1 from create_sequences.py)
+# Load sequences
 input_files = sorted(glob.glob('data/processed/sequences/*_input.npy'))
 output_files = sorted(glob.glob('data/processed/sequences/*_output.npy'))
 
@@ -14,17 +16,17 @@ output_files = sorted(glob.glob('data/processed/sequences/*_output.npy'))
 X = np.array([np.load(f) for f in input_files])
 y = np.array([np.load(f) for f in output_files])
 
-print(f"X shape: {X.shape}, y shape: {y.shape}")  # Should be e.g., (samples, 6, 128, 128, 1), (samples, 1, 128, 128, 1)
+print(f"X shape: {X.shape}, y shape: {y.shape}")
 
-# Model definition for single-frame prediction
+# Model definition
 model = Sequential([
     ConvLSTM2D(filters=64, kernel_size=(3, 3), input_shape=(6, 128, 128, 1), padding='same', return_sequences=True),
     BatchNormalization(),
     ConvLSTM2D(filters=64, kernel_size=(3, 3), padding='same', return_sequences=True),
     BatchNormalization(),
-    ConvLSTM2D(filters=64, kernel_size=(3, 3), padding='same', return_sequences=False),  # Collapse to single frame
+    ConvLSTM2D(filters=64, kernel_size=(3, 3), padding='same', return_sequences=False),
     BatchNormalization(),
-    Conv2D(filters=1, kernel_size=(3, 3), activation='sigmoid', padding='same')  # Output: (None, 128, 128, 1)
+    Conv2D(filters=1, kernel_size=(3, 3), activation='sigmoid', padding='same')
 ])
 
 # Compile model
@@ -33,11 +35,12 @@ model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 # Model summary
 model.summary()
 
-# Train model
-history = model.fit(X, y, epochs=10, batch_size=4, validation_split=0.2, verbose=1)
-
-# Save model
+# Add checkpoint to save after each epoch
 os.makedirs('models', exist_ok=True)
+checkpoint = ModelCheckpoint('models/nowcast_model.h5', save_best_only=True, monitor='val_loss', mode='min', verbose=1)
+history = model.fit(X, y, epochs=5, batch_size=4, validation_split=0.2, verbose=1, callbacks=[checkpoint])
+
+# Final save (redundant but ensures the last epoch is saved)
 model.save('models/nowcast_model.h5')
 print("Model saved to models/nowcast_model.h5")
 
