@@ -1,0 +1,2 @@
+this is the directory where trained models will be saved
+this is a placeholder file.

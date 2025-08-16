@@ -1,0 +1,2 @@
+This is where model training jupyter notebooks will be saved.
+This is a placeholder file.
