@@ -1,0 +1,2 @@
+This is the folder for frontend files.
+This is a placeholder file just to push the commit on the GitHub
