@@ -18,3 +18,5 @@ for i in range(len(images) - (input_length + output_length) + 1):
     output_seq = np.stack(output_seq, axis=0)[:, :, :, np.newaxis]  # Shape: (1, 128, 128, 1)
     np.save(os.path.join(sequence_dir, f'seq_{i}_input.npy'), input_seq)
     np.save(os.path.join(sequence_dir, f'seq_{i}_output.npy'), output_seq)
+
+    
