@@ -18,6 +18,7 @@ model = models.Sequential([
     layers.Conv3D(1, (3, 3, 3), activation='sigmoid', padding='same')
 ])
 
+
 model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 model.summary()
 
