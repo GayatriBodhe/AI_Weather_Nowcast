@@ -27,6 +27,7 @@ for i in range(len(frames) - sequence_length * 2 + 1):
 sequences_x = np.array(sequences_x)[..., np.newaxis]  # Shape: (n, 6, 128, 128, 1)
 sequences_y = np.array(sequences_y)[..., np.newaxis]  # Shape: (n, 6, 128, 128, 1)
 
+
 # Save to laptop's data directory
 os.makedirs("data/mumbai/processed/sequences/", exist_ok=True)
 np.save("data/mumbai/processed/sequences/train_x.npy", sequences_x)

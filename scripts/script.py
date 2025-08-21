@@ -9,3 +9,4 @@ for i in range(12):
     plt.title(f'Predicted Frame {i+1} (Mumbai Data)')
     plt.savefig(f"data/mumbai/processed/prediction_frame_{i+1}.png")
     plt.close()
+    
